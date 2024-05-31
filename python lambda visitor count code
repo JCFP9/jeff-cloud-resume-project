@@ -1,58 +1,32 @@
-import json
 import boto3
-import os
+from botocore.exceptions import ClientError
 
-# Initialize DynamoDB resource
-dynamodb = boto3.resource('dynamodb')
-# Get the DynamoDB table name from environment variables
-ddbTableName = os.environ['databaseName']
-table = dynamodb.Table(ddbTableName)
-
+# Define the Lambda handler function
 def lambda_handler(event, context):
+    # Initialize a DynamoDB client
+    dynamodb = boto3.resource('dynamodb')
+    
+    # Replace 'YourTableName' with the actual name of your DynamoDB table
+    table = dynamodb.Table('VisitCounter')
+    
     try:
-        # Attempt to update the item by incrementing the visitor count
-        ddbResponse = table.update_item(
+        # Update the 'count' attribute of the item with 'id' as 'counter'
+        # Use '#c' as a placeholder for the reserved keyword 'count'
+        response = table.update_item(
             Key={
-                'id': 'visitor_count'
+                'id': 'counter'
             },
-            UpdateExpression='SET visitor_count = if_not_exists(visitor_count, :start) + :inc',
+            UpdateExpression='ADD #c :inc',
+            ExpressionAttributeNames={
+                '#c': 'count'
+            },
             ExpressionAttributeValues={
-                ':start': 0,
                 ':inc': 1
             },
-            ReturnValues="UPDATED_NEW"
+            ReturnValues='UPDATED_NEW'
         )
-        
-        # Extract the updated visitor count from the response
-        visitor_count = ddbResponse['Attributes']['visitor_count']
-        
-        # Format the response body
-        responseBody = json.dumps({"count": int(visitor_count)})
-
-        # Create the API response object
-        apiResponse = {
-            "isBase64Encoded": False,
-            "statusCode": 200,
-            'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
-            },
-            "body": responseBody
-        }
-        
-    except Exception as e:
-        # Handle exceptions and create an error response
-        apiResponse = {
-            "isBase64Encoded": False,
-            "statusCode": 500,
-            'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
-            },
-            "body": json.dumps({'error': str(e)})
-        }
-    
-    # Return the API response object
-    return apiResponse
+        return response
+    except ClientError as e:
+        # Handle the exception
+        print(e.response['Error']['Message'])
+        return e.response['Error']['Message']
