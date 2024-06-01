@@ -8,11 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #f0f8ff;
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
             color: #333;
+            background-color: #f0f8ff;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #bbbbbb;
         }
         header {
             background-color: #4CAF50;
@@ -20,6 +25,10 @@
             text-align: center;
             padding: 20px 0;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        body.dark-mode header {
+            background-color: #1e1e1e;
         }
         header h1, header h2 {
             margin: 0;
@@ -33,6 +42,30 @@
             font-size: 1.2em;
             margin-top: 10px;
         }
+        .toggle-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+            color: white;
+        }
+        .toggle-button:hover {
+            background-color: #45a049;
+        }
+        body.dark-mode .toggle-button {
+            background-color: #333;
+            color: white;
+        }
+        body.dark-mode .toggle-button:hover {
+            background-color: #444;
+        }
         main {
             padding: 20px;
             max-width: 800px;
@@ -40,6 +73,10 @@
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        body.dark-mode main {
+            background-color: #1e1e1e;
         }
         footer {
             text-align: center;
@@ -50,6 +87,10 @@
             width: 100%;
             bottom: 0;
             box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        body.dark-mode footer {
+            background-color: #1e1e1e;
         }
         .content {
             text-align: justify;
@@ -63,26 +104,66 @@
             color: white;
             text-decoration: none;
             border-radius: 4px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s;
         }
         .button:hover {
             background-color: #45a049;
+        }
+        body.dark-mode .button {
+            background-color: #333;
+            color: white;
+        }
+        body.dark-mode .button:hover {
+            background-color: #444;
         }
     </style>
 </head>
 <body>
     <header>
         <h1>My Cloud Resume Challenge</h1>
-        <h2>Jeffrey Pui Edition</h2>
+        <h2>Jeffrey Pui edition</h2>
     </header>
     <main>
         <div class="content">
             <p>Welcome to my cloud resume challenge project. This is a demonstration of my skills and achievements in cloud technologies.</p>
             <a href="#" class="button">Learn More</a>
+            <p>Visitor Count: <span id="counter">Loading...</span></p>
         </div>
     </main>
     <footer>
-        &copy; 2024 My Cloud Resume Challenge
+        &copy; 2024 Jeffrey's Cloud Resume Challenge
     </footer>
+    <button class="toggle-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    
+    <script>
+        async function getVisitors() {
+            try {
+                let response = await fetch('https://jargzqmps0.execute-api.us-east-1.amazonaws.com/', {
+                    method: 'GET',
+                });
+                let data = await response.json();
+                document.getElementById("counter").textContent = data.visitor_count;
+                console.log(data);
+                return data;
+            } catch (err) {
+                console.error(err);
+                document.getElementById("counter").textContent = "Error loading count";
+            }
+        }
+
+        // Function to toggle dark mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const button = document.querySelector('.toggle-button');
+            if (document.body.classList.contains('dark-mode')) {
+                button.textContent = 'Toggle Light Mode';
+            } else {
+                button.textContent = 'Toggle Dark Mode';
+            }
+        }
+
+        // Fetch the visitor count when the page loads
+        document.addEventListener("DOMContentLoaded", getVisitors);
+    </script>
 </body>
 </html>
