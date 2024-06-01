@@ -136,13 +136,17 @@
     <button class="toggle-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
     
     <script>
-        async function getVisitors() {
+         async function getVisitors() {
             try {
                 let response = await fetch('https://jargzqmps0.execute-api.us-east-1.amazonaws.com/', {
                     method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 });
                 let data = await response.json();
-                document.getElementById("counter").textContent = data.visitor_count;
+                // Access the visitor count properly
+                document.getElementById("counter").textContent = data.Attributes.count;
                 console.log(data);
                 return data;
             } catch (err) {
