@@ -161,13 +161,28 @@
             const button = document.querySelector('.toggle-button');
             if (document.body.classList.contains('dark-mode')) {
                 button.textContent = 'Toggle Light Mode';
+                localStorage.setItem('theme', 'dark');
             } else {
                 button.textContent = 'Toggle Dark Mode';
+                localStorage.setItem('theme', 'light');
             }
         }
 
-        // Fetch the visitor count when the page loads
-        document.addEventListener("DOMContentLoaded", getVisitors);
+        // Check the user's theme preference from localStorage
+        function loadTheme() {
+            const theme = localStorage.getItem('theme');
+            if (theme && theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                const button = document.querySelector('.toggle-button');
+                button.textContent = 'Toggle Light Mode';
+            }
+        }
+
+        // Fetch the visitor count and load theme when the page loads
+        document.addEventListener("DOMContentLoaded", () => {
+            getVisitors();
+            loadTheme();
+        });
     </script>
 </body>
 </html>
